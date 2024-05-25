@@ -1,92 +1,99 @@
 
-// program 12
+// program 13
 //
-// implementation of a priority queue using linked list
+// implementation of Tree data structure
 
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct Node {
+
+typedef struct TreeNode {
 	int data;
-	int priority;
-	struct Node *next;
-} node_t;
+	struct TreeNode *left;
+	struct TreeNode *right;
+} tnode;
 
-node_t *head = NULL, *tail = NULL;
+tnode *root = NULL;
 
-void Enqueue(int data, int priority) {
-	node_t *node = malloc(sizeof(node_t));
+tnode *Create(int data) {
+	tnode *node = malloc(sizeof(tnode));
+	node->data = data;
+	node->left = node->right = NULL;
+	return node;
+}
+
+tnode *Insert(tnode *node, int data) {
+	if (node == NULL) return Create(data);
+
+	if (data < node->data) {
+		node->left = Insert(node->left, data);
+	} else {
+		node->right = Insert(node->right, data);
+	}
+	return node;
+}
+
+tnode *Delete(tnode *node, int data) {
+	if (node == NULL) return NULL;
+
+	if (node->data == data) {
+		free(node);
+		return NULL;
+	}
+	node->left = Delete(node->left, data);
+	node->right = Delete(node->right, data);
+
+	return node;
+}
+
+tnode *Search(tnode *node, int data) {
+	if (node == NULL) return NULL;
+
+	tnode *left = Search(node->left, data);
+	tnode *right = Search(node->left, data);
+
+	if (left != NULL) return left;
+	return right;
+}
+
+void Pre(tnode *node) {
 	if (node == NULL) return;
 
-	node->data = data;
-	node->priority = priority;
-	node->next = NULL;
+	printf("%d ", node->data);
+	Pre(node->left);
+	Pre(node->right);
+}
+void In(tnode *node) {
+	if (node == NULL) return;
 
-	if (head == NULL) {
-		head = tail = node;
-	} else {
-		tail->next = node;
-		tail = node;
-	}
-	printf("Enqueued : (%d, %d)\n", data, priority);
+	In(node->left);
+	printf("%d ", node->data);
+	In(node->right);
 }
 
-void Dequeue() {
-	node_t *tmp = head;
-	node_t *ret = head;
-	node_t *prev = NULL;
+void Post(tnode *node) {
+	if (node == NULL) return;
 
-	while (tmp->next != NULL) {
-		if (tmp->next->priority > ret->priority) {
-			prev = tmp;
-			ret = tmp->next;
-		}
-		tmp = tmp->next;
-	}
-	if (prev == NULL) {
-		head = head->next;
-	} else {
-		prev->next = ret->next;
-	}
-
-	printf("Dequeued: (%d, %d)\n", ret->data, ret->priority);
-	free(ret);
-}
-
-void Search(int data) {
-	node_t *tmp = head;
-	while (tmp != NULL) {
-		if (tmp->data == data) {
-			printf("%d found in queue\n", data);
-			return;
-		}
-		tmp = tmp->next;
-	}
-	printf("%d not found in quque\n", data);
-}
-
-void Display() {
-	node_t *tmp = head;
-	if (tmp == NULL) {
-		printf("Queue is empty\n");
-		return;
-	}
-
-	while (tmp != NULL) {
-		printf("(%d, %d) ", tmp->data, tmp->priority);
-		tmp = tmp->next;
-	}
-	putchar('\n');
+	Post(node->left);
+	Post(node->right);
+	printf("%d ", node->data);
 }
 
 int main() {
-	Enqueue(10, 0);
-	Enqueue(20, 1);
-	Enqueue(30, 3);
-	Enqueue(40, 2);
+	root = Insert(root, 10);
+	root = Insert(root, 20);
+	root = Insert(root, 25);
+	root = Insert(root, 30);
+	printf("\nPreorder: ");
+	Pre(root);
 
-	Dequeue();
-	Dequeue();
-	Dequeue();
-	Search(10);
-	Display();
+	printf("\nPostoder: ");
+	Post(root);
+
+	root = Delete(root, 30);
+	root = Delete(root, 20);
+
+	printf("\nInorder: ");
+	In(root);
+
+	return 0;
 }
