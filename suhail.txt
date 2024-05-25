@@ -1,70 +1,76 @@
 
-// program 10
+// program 11
 //
-// implementation of a stack using linked list
+// implementation of a queue using linked list
 
 #include <stdio.h>
 #include <stdlib.h>
-
 typedef struct Node {
 	int data;
 	struct Node *next;
 } node_t;
 
-node_t *head;
+node_t *head = NULL, *tail = NULL;
 
-void Push(int data) {
-	node_t *node = (node_t *)malloc(sizeof(node_t));
+void Enqueue(int data) {
+	node_t *node = malloc(sizeof(node_t));
 	node->data = data;
-	node->next = head;
-	head = node;
-	printf("Pushed: %d\n", data);
+	node->next = NULL;
+
+	if (head == NULL) {
+		head = tail = node;
+	} else {
+		tail->next = node;
+		tail = node;
+	}
+
+	printf("Enqueued: %d\n", data);
 }
 
-void Pop() {
-	if (head == NULL)
-		printf("Stack is Empty!!\n");
-	else {
-		node_t *tmp = head;
-		head = head->next;
-		printf("Popped: %d\n", tmp->data);
-		free(tmp);
+void Dequeue() {
+	if (head == NULL) {
+		printf("Queue is empty\n");
+		return;
 	}
+	node_t *tmp = head;
+	head = head->next;
+
+	printf("Dequeued: %d\n", tmp->data);
+	free(tmp);
 }
 
 void Search(int data) {
-	int f = 0;
 	node_t *tmp = head;
 	while (tmp != NULL) {
 		if (tmp->data == data) {
-			f = 1;
-			break;
+			printf("%d found in queue\n", data);
+			return;
 		}
-		tmp = tmp->next;
 	}
-	if (f)
-		printf("%d is not in stack\n", data);
-	else
-		printf("%d found in stack", data);
+	printf("%d not found in queue\n", data);
 }
 
 void Display() {
 	node_t *tmp = head;
-	while (tmp != NULL) {
-		printf("%d%s", tmp->data, (tmp->next == NULL) ? "\n" : "->");
-		tmp = tmp->next;
-	}
+	if (tmp == NULL) {
+		printf("Queue is empty\n");
+	} else
+		while (tmp != NULL) {
+			printf("%d ", tmp->data);
+			tmp = tmp->next;
+		}
+	putchar('\n');
 }
 
 int main() {
-	Push(10);
-	Push(14);
-	Push(11);
-	Push(13);
-	Pop();
-	Pop();
-	Pop();
+	Enqueue(10);
+	Enqueue(20);
+	Enqueue(30);
+	Enqueue(40);
+	Dequeue();
+	Dequeue();
+	Dequeue();
+	Search(40);
+	Dequeue();
 	Display();
-
-	return 0;
 }
